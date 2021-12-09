@@ -82,3 +82,74 @@ as
 update take_course
 set grade = @grade
 where sid = @studentID and cid = @courseID
+
+
+-- 4 supervisor
+--a
+create proc EvaluateProgressReport
+@supervisorID int,
+@thesisSerialNo int,
+@progressReportNo int,
+@evaluation int
+as
+if(@evaluation<=3 and @evaluation>=0)
+	update progress_report
+	set evaluation = @evaluation , vid = @supervisorID 
+	where  serial_num = @thesisSerialNo and report_num = @progressReportNo;
+
+
+--b
+go
+
+create proc ViewSupStudentsYears
+@supervisorID int
+as
+select s.first_name , s.last_name , t.years_spent from student s inner join make_under_supervision m on s.ID = m.sid
+inner join thesis t on t.serial_num = m.serial_num
+where m.vid = @supervisorID
+
+go
+
+--c
+create proc SubViewProfile
+@supervisorID int
+as
+select * 
+from supervisor
+where supervisor.ID = @supervisorID
+
+go
+-- create proc UpdateSupProfile
+
+
+--d
+create proc ViewAllStudentPublications
+@StudentID int
+as
+select *
+from publication
+where sid = @StudentID
+
+go
+
+--e
+create proc AdddefenseGucian
+@ThesisSerialNo int,
+@DefenseDate DateTime,
+@DefenseLocation varchar(15)
+as 
+insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
+go
+
+create proc AddDefenseNonGucian
+@ThesisSerialNo int,
+@DefenseDate DateTime,
+@DefenseLocation varchar(15)
+as 
+declare @min
+select @min = min(t.grade) 
+from take_course t inner join make_under_supervision m on m.sid = t.sid
+where m.serial_num = @ThesisSerialNo
+if(@min > 50)
+insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
+
