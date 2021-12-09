@@ -1,8 +1,11 @@
-﻿--create Database postgrad_office
---create table Users(ID int primary Key ,first_name Varchar(50),last_name varchar(50), email varchar(50))
---create table admins(ID int Primary key ,foreign key(ID) references Users on delete cascade )
+
+create Database Postgrad_office
+ go
+use Postgrad_office
+
+
 create table student(
-ID int primary key,
+ID int primary key Identity,
 first_name Varchar(20),
 last_name varchar(20),
 email varchar(50),
@@ -26,22 +29,20 @@ foreign key(ID) references Student)
 create table non_GUCian(
 ID int primary key,
 foreign key(ID) references student)
-
-create table course( 
-ID int primary key,
+create table course( ID int primary key,
 credit_hours int,
-code varchar(10),
+code varchar(50),
 fees int)
 
 create table thesis (
 serial_num varchar(50) primary key,
 field varchar(50),
-start_date datetime,
+start_date datetime ,
 end_date datetime,
 title varchar(50),
 type varchar(50),
 num_extensions int,
-years_spent as year(end_date) - year(start_date))
+years_spent as year(end_date) -year(start_date))
 
 create table payment (
 ID int primary key,
@@ -52,7 +53,7 @@ serial_num varchar(50),
 foreign key(serial_num) references thesis on delete cascade)
 
 create table installment(
-installment_num int identity,
+installment_num int,
 pid int,
 date datetime,
 status bit,
@@ -70,7 +71,7 @@ password varchar(20),
 address varchar(10))
 
 create table publication (
-title varchar(50) primary key ,
+title varchar(50) primary key,
 host varchar(50),
 place varchar(50),
 date datetime ,
@@ -83,7 +84,7 @@ foreign key(pid) references payment on delete cascade)
 create table defense(
 date datetime ,
 serial_num varchar(50),
-grade varchar(50),
+grade decimal,
 location varchar(50),
 sid int ,
 primary key(date ,serial_num),
@@ -137,6 +138,17 @@ create table evaluates (
 eid int,
 date datetime,
 serial_num varchar(50),
+comment varchar(300),
 primary key(eid,date,serial_num),
 foreign key(eid) references examiner on delete cascade,
 foreign key(date,serial_num) references defense on delete cascade)
+
+create table NonGUCian_pay_for_Course(
+payment_num int,
+sid int,
+cid int,
+Primary key(payment_num,sid,cid),
+foreign key(payment_num) references Payment,
+foreign key(sid) references Non_GUCian,
+foreign key(cid) references Course)
+
