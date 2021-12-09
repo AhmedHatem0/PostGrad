@@ -21,7 +21,40 @@ go
 
 -- 2 a)
 
+--2 registered user
+--a
+--user login with username and password, returning a success bit
+
+go
+
+CREATE FUNCTION userLogin (@ID int, @password varchar(20))
+RETURNS bit
+AS
+begin
+	declare @ret bit
+    if (exists( 
+	select *
+	from postGradUser U
+	where U.ID = @ID and U.password = @password
+	))
+	set @ret = '1';
+	else 
+	set @ret = '0';
+	return @ret;
+end;
+
 -- 2 b)
+go
+--b
+--given the ID of the user and his mobile number, it adds it to the database
+
+create proc addMobile
+@ID int, @mobile_number varchar(20)
+as
+if(exists(select * from GucianStudent G where G.id = @ID)) 
+insert into GUCStudentPhoneNumber Values(@ID,@mobile_number);
+else
+insert into NonGUCStudentPhoneNumber Values(@ID,@mobile_number);
 
 -- 3 a) 
 go 
@@ -234,3 +267,34 @@ from take_course t inner join make_under_supervision m on m.sid = t.sid
 where m.serial_num = @ThesisSerialNo
 if(@min > 50)
 insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
+
+go
+--f
+--inserting an examiner in the examiner table and to his assigned thesis evaluation
+create proc AddExaminer
+@ThesisSerialNo int, @DefenseDate Datetime, @ExaminerName varchar(20)
+, @National bit,@fieldOfWork varchar(20)
+as
+insert into examiner(name, field_of_work, is_national) Values(@ExaminerName, @fieldOfWork, @National);
+insert into evaluates values(IDENT_CURRENT('testing'),@defenseDate,@ThesisSerialNo,null);
+
+go
+
+--4g
+--deleteing a thesis if the evaluation of its last progress report is zero
+create proc CancelThesis
+@ThesisSerialNo int
+As
+if(exists( select * from progress_report PR where PR.serial_num = @ThesisSerialNo and PR.date = max(PR.date) and PR.evaluation = 0))
+delete from thesis
+where thesis.serial_num = @ThesisSerialNo;
+
+go
+--4h
+-- adding a grade to a thesis
+create proc AddGrade
+@ThesisSerialNo int
+As
+-- The grade to be inserted is needed???
+
+
