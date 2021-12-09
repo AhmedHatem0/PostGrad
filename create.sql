@@ -1,154 +1,181 @@
-
-create Database Postgrad_office
- go
-use Postgrad_office
-
-
-create table student(
-ID int primary key Identity,
-first_name Varchar(20),
-last_name varchar(20),
+--create Database postgrad_office
+create table PostGradUser(
+ID int primary Key Identity,
 email varchar(50),
-faculty varchar(20),
-type Int,
-GPA decimal(3,2),
-address varchar(10),
 password varchar(20))
 
-create table student_mobile(
-sid int,
-mobile_number varchar(20),
-primary key(sid,mobile_number),
-foreign key(sid) references student on delete cascade)
+create table admin(
+ID int Primary key identity,
+foreign key(ID) references PostGradUser )
 
-create table GUCian (
+create table GUCianStudent(
 ID int primary key ,
-undergrad_ID int,
-foreign key(ID) references Student)
+first_name Varchar(20),
+last_name varchar(20),
+faculty varchar(20),
+type Varchar(10),
+GPA decimal,
+address varchar(50),
+UndergradID varchar(10),
+foreign key(ID) references PostGradUser)
 
-create table non_GUCian(
-ID int primary key,
-foreign key(ID) references student)
-create table course( ID int primary key,
+create table NonGUCianStudent(
+ID int primary key ,
+first_name Varchar(20),
+last_name varchar(20),
+faculty varchar(20),
+type Varchar(10),
+GPA decimal,
+address varchar(50),
+foreign key(ID) references PostGradUser)
+
+create table GUCStudentPhoneNumber(
+id int,
+mobile_number varchar(20),
+primary key(id,mobile_number),
+foreign key(id) references GUCianStudent)
+
+create table NonGUCStudentPhoneNumber(
+id int,
+mobile_number varchar(20),
+primary key(id,mobile_number),
+foreign key(id) references NonGUCianStudent)
+
+create table Course( 
+ID int primary key identity,
 credit_hours int,
-code varchar(50),
-fees int)
+code varchar(10),
+fees decimal)
+
+create table supervisor(
+ID int primary key ,
+faculty varchar(20), 
+name Varchar(20),
+foreign key(ID) references PostGradUser )
+
+create table payment (
+ID int primary key,
+num_installments int,
+total_amount decimal,
+fund_precentage decimal)
 
 create table thesis (
-serial_num varchar(50) primary key,
+serial_num int primary key,
 field varchar(50),
 start_date datetime ,
 end_date datetime,
 title varchar(50),
 type varchar(50),
 num_extensions int,
-years_spent as year(end_date) -year(start_date))
+payment_ID int,
+grade decimal,
+defenseDate datetime,
+years_spent as year(end_date) -year(start_date),
+foreign key(payment_ID) references payment)
 
-create table payment (
-ID int primary key,
-num_installments int,
-total_amount int,
-fund_precentage int ,
-serial_num varchar(50),
-foreign key(serial_num) references thesis on delete cascade)
+create table publication (
+title varchar(50) primary key ,
+host varchar(50),
+place varchar(50),
+pub_date datetime ,
+is_accepted bit)
+
+create table examiner(
+ID int primary key Identity,
+name varchar(20),
+field_of_work varchar(20),
+is_national bit)
+
+create table defense(
+date datetime,
+serial_num int,
+grade decimal,
+location varchar(15),
+primary key(date ,serial_num),
+foreign key(serial_num) references thesis)
+
+create table GucianProgressReport(
+report_num int,
+sid int,
+date datetime,
+evaluation int,
+progress_state int,
+serial_num int,
+vid int,
+primary key(report_num,sid),
+foreign key(serial_num) references thesis,
+foreign key(sid) references GUCianStudent,
+foreign key(vid) references supervisor)
+
+create table NonGucianProgressReport(
+report_num int,
+sid int,
+date datetime,
+evaluation int,
+progress_state int,
+serial_num int,
+vid int,
+primary key(report_num,sid),
+foreign key(serial_num) references thesis,
+foreign key(sid) references NonGUCianStudent,
+foreign key(vid) references supervisor)
 
 create table installment(
 installment_num int,
 pid int,
 date datetime,
 status bit,
-amount int,
+amount decimal,
 primary key(installment_num,pid),
-foreign key(pid) references payment on delete cascade )
+foreign key(pid) references payment)
 
-create table supervisor(
-ID int primary key ,
-faculty varchar(20), 
-first_name Varchar(20),
-last_name varchar(20),
-email varchar(50),
-password varchar(20),
-address varchar(10))
-
-create table publication (
-title varchar(50) primary key,
-host varchar(50),
-place varchar(50),
-date datetime ,
-is_accepted bit,
-sid int,
-pid int ,
-foreign key(sid) references student on delete cascade,
-foreign key(pid) references payment on delete cascade)
-
-create table defense(
-date datetime ,
-serial_num varchar(50),
-grade decimal,
-location varchar(50),
-sid int ,
-primary key(date ,serial_num),
-foreign key(serial_num) references thesis on delete cascade ,
-foreign key(sid) references student on delete cascade)
-
-create table examiner(
-ID int primary key,
-name varchar(50),
-field_of_work varchar(50),
-is_national bit)
-
-create table progress_report(
-report_num int,
-serial_num varchar(50),
-date datetime,
-description varchar(50),
-evaluation int,
-progress_state int ,
-sid int,
-vid int,
-primary key(report_num,serial_num),
-foreign key(serial_num) references thesis on delete no action,
-foreign key(sid) references student  on delete no action,
-foreign key(vid) references supervisor on delete no action)
-
-create table make_under_supervision(
-sid int,
-vid int,
-serial_num varchar(50) primary key,
-foreign key(sid) references student on delete no action,
-foreign key(vid) references supervisor on delete no action,
-foreign key(serial_num) references thesis on delete no action)
-
-create table take_course(
-sid int ,
-cid int ,
-grade varchar(50),
-primary key(sid,cid),
-foreign key(sid) references student on delete cascade,
-foreign key(cid) references course on delete cascade)
-
-create table publicaton_of_thesis(
-serial_num varchar(50),
-title varchar(50),
-primary key(serial_num, title),
-foreign key(serial_num) references thesis on delete no action,
-foreign key(title) references publication on delete no action)
-
-create table evaluates (
-eid int,
-date datetime,
-serial_num varchar(50),
-comment varchar(300),
-primary key(eid,date,serial_num),
-foreign key(eid) references examiner on delete cascade,
-foreign key(date,serial_num) references defense on delete cascade)
-
-create table NonGUCian_pay_for_Course(
+create table NonGucianStudentPayForCourse(
 payment_num int,
 sid int,
 cid int,
 Primary key(payment_num,sid,cid),
 foreign key(payment_num) references Payment,
-foreign key(sid) references Non_GUCian,
+foreign key(sid) references NonGucianStudent,
 foreign key(cid) references Course)
 
+create table NonGucianStudentTakeCourse(
+sid int,
+cid int,
+grade decimal,
+primary key(sid,cid),
+foreign key(sid) references NonGucianStudent,
+foreign key(cid) references course)
+
+create table GUCianStudentRegisterThesis(
+sid int,
+vid int,
+serial_num int,
+primary key(sid, vid, serial_num),
+foreign key(sid) references GUCianStudent,
+foreign key(vid) references supervisor,
+foreign key(serial_num) references thesis)
+
+create table NonGUCianStudentRegisterThesis(
+sid int,
+vid int,
+serial_num int,
+primary key(sid, vid, serial_num),
+foreign key(sid) references NonGUCianStudent,
+foreign key(vid) references supervisor,
+foreign key(serial_num) references thesis)
+
+create table ExaminerEvaluateDefense (
+eid int,
+date datetime,
+serial_num int,
+Comment varchar(300),
+primary key(eid,date,serial_num),
+foreign key(eid) references examiner,
+foreign key(date,serial_num) references defense)
+
+create table ThesisHasPublication(
+serial_num int,
+title varchar(50),
+primary key(serial_num, title),
+foreign key(serial_num) references thesis,
+foreign key(title) references publication )
