@@ -1,4 +1,5 @@
---Abdo
+
+-- 1 a) 
 create Proc StudentRegister 
 @first_name varchar(20),
 @last_name varchar(20),
@@ -6,7 +7,7 @@ create Proc StudentRegister
 @faculty varchar(20),
 @Gucian bit,
 @email varchar(50),
-@address varchar(10)
+@address varchar(50)
 as 
 Insert Into Student (first_name,last_name,password,faculty,email,address) 
 values (@first_name,@last_name,@password,@faculty,@email,@address)
@@ -15,61 +16,34 @@ select @ID = ID from student where email = @email
 IF @gucian = 1 Insert Into GUCian(ID) values (@ID)
 else Insert Into non_GUCian(ID) values (@ID)
 
---3 Admin 
- 
+go
+-- create proc SupervisorRegister
+
+-- 2 a)
+
+-- 2 b)
+
+-- 3 a) 
 go 
 create proc AdminListSup
 As 
 select * from supervisor
 
+-- 3 b)
 go
-create proc AdminViewAllTheses 
-As
-Select * from thesis
-
-go
-create proc AdminViewStudentThesisBySupervisor
-As 
-Select sv.first_name +sv.last_name as ' Supervisor name', t.title , std.first_name + std.last_name as 'Student name'
-from supervisor sv inner join make_under_supervision mus on sv.ID = mus.vid 
-inner join student std on std.ID = mus.sid 
-inner join thesis t on t.serial_num = mus.serial_num 
-
-go
-create proc AdminUpdateExtension
-@ThesisSerialNo int 
-as 
-update thesis 
-set thesis.num_extensions += 1 where thesis.serial_num = @ThesisSerialNo
-go
-create proc AdminViewStudentProfile
-@sid Int 
-As
-select * from student where student.ID = @sid
-
-go
-create proc AdminListAcceptPublication
-As 
-select P.title , Pt.serial_num from publication P inner join publicaton_of_thesis pt on p.title = pt.title
-where p.is_accepted = 'True'
-
-go
-create proc ViewExamSupDefense 
-@defenseDate datetime
-As
-select e.name from examiner e
-inner join evaluates eval on e.ID = eval.eid 
-where @defenseDate = eval.date
-select s.name from evaluates
-inner join make_under_supervision mus on eval.serial_num = mus.serial_num 
-inner join supervisor sv on sv.id = mus.vid where @defenseDate = eval.date
---Abdo
 create proc AdminViewSupervisorProfile
 @supId int
 as 
 select * from supervisor 
 where id = @supId
 
+-- 3 c)
+go
+create proc AdminViewAllTheses 
+As
+Select * from thesis
+
+-- 3 d)
 go
 create proc AdminViewOnGoingTheses
 @thesesCount int output
@@ -78,14 +52,33 @@ select @thesesCount = count(*) from thesis
 where current_timestamp >= start_date and 
 (end_date is null or current_timestamp <= end_date)
 
+-- 3 e)
+go
+create proc AdminViewStudentThesisBySupervisor
+As 
+Select sv.first_name +sv.last_name as 'Supervisor name', t.title , std.first_name + std.last_name as 'Student name'
+from supervisor sv inner join make_under_supervision mus on sv.ID = mus.vid 
+inner join student std on std.ID = mus.sid 
+inner join thesis t on t.serial_num = mus.serial_num 
+
+-- 3 f)
 go
 create proc AdminListNonGucianCourse
 @courseID int
 as
 select s.first_name+' '+s.last_name as name, c.code, t.grade 
 from student s, take_course t, course c
-where s.ID = t.sid and c.ID = t.cid and t.cid = @courseID 
+where s.ID = t.sid and c.ID = t.cid and t.cid = @courseID
 
+-- 3 g)
+go
+create proc AdminUpdateExtension
+@ThesisSerialNo int 
+as 
+update thesis 
+set thesis.num_extensions += 1 where thesis.serial_num = @ThesisSerialNo
+
+-- 3 h)
 go
 create proc AdminIssueThesisPayment
 @ThesisSerialNo int,
@@ -101,6 +94,14 @@ set @success = 1
 insert into payment (serial_num, total_amount, num_installments, fund_precentage) 
 values (@ThesisSerialNo, @amount, @noOfInstallments, @fundPercentage)
 
+-- 3 i)
+go
+create proc AdminViewStudentProfile
+@sid Int 
+As
+select * from student where student.ID = @sid
+
+-- 3 j)
 go
 create proc AdminIssueInstallPayment
 @paymentID int, 
@@ -122,6 +123,14 @@ begin
 	set @cnt -= 1
 end
 
+-- 3 k)
+go
+create proc AdminListAcceptPublication
+As 
+select P.title , Pt.serial_num from publication P inner join publicaton_of_thesis pt on p.title = pt.title
+where p.is_accepted = 'True'
+
+-- 3 l)
 go
 create proc AddCourse
 @courseCode varchar(10), 
@@ -149,9 +158,20 @@ update take_course
 set grade = @grade
 where sid = @studentID and cid = @courseID
 
+-- 3 m)
+go
+create proc ViewExamSupDefense 
+@defenseDate datetime
+As
+select e.name from examiner e
+inner join evaluates eval on e.ID = eval.eid 
+where @defenseDate = eval.date
+select s.name from evaluates
+inner join make_under_supervision mus on eval.serial_num = mus.serial_num 
+inner join supervisor sv on sv.id = mus.vid where @defenseDate = eval.date 
 
--- 4 supervisor
---a
+-- 4 a)
+go
 create proc EvaluateProgressReport
 @supervisorID int,
 @thesisSerialNo int,
@@ -163,10 +183,8 @@ if(@evaluation<=3 and @evaluation>=0)
 	set evaluation = @evaluation , vid = @supervisorID 
 	where  serial_num = @thesisSerialNo and report_num = @progressReportNo;
 
-
---b
+-- 4 b)
 go
-
 create proc ViewSupStudentsYears
 @supervisorID int
 as
@@ -174,9 +192,8 @@ select s.first_name , s.last_name , t.years_spent from student s inner join make
 inner join thesis t on t.serial_num = m.serial_num
 where m.vid = @supervisorID
 
+-- 4 c)
 go
-
---c
 create proc SubViewProfile
 @supervisorID int
 as
@@ -188,7 +205,7 @@ go
 -- create proc UpdateSupProfile
 
 
---d
+-- 4 d)
 create proc ViewAllStudentPublications
 @StudentID int
 as
@@ -196,26 +213,24 @@ select *
 from publication
 where sid = @StudentID
 
+-- 4 e)
 go
-
---e
 create proc AdddefenseGucian
 @ThesisSerialNo int,
 @DefenseDate DateTime,
 @DefenseLocation varchar(15)
 as 
 insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
-go
 
+go
 create proc AddDefenseNonGucian
 @ThesisSerialNo int,
 @DefenseDate DateTime,
 @DefenseLocation varchar(15)
 as 
-declare @min
+declare @min int
 select @min = min(t.grade) 
 from take_course t inner join make_under_supervision m on m.sid = t.sid
 where m.serial_num = @ThesisSerialNo
 if(@min > 50)
 insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
-
