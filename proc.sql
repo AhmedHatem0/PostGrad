@@ -17,6 +17,19 @@ IF @gucian = 1 Insert Into GUCian(ID) values (@ID)
 else Insert Into non_GUCian(ID) values (@ID)
 
 go
+--1a.2
+create proc SupervisorRegister
+@first_name varchar(20),
+@last_name varchar(20),
+@password varchar(20),
+@faculty varchar(20),
+@email varchar(50) 
+as 
+insert into PostGradUser(email,password) values(@email,@password)
+insert into supervisor values(IDENT_CURRENT('PostGradUser'),@faculty,@first_name+' '+@last_name);
+
+
+go
 -- create proc SupervisorRegister
 
 -- 2 a)
