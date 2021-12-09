@@ -306,8 +306,12 @@ go
 --4h
 -- adding a grade to a thesis
 create proc AddGrade
-@ThesisSerialNo int
+@ThesisSerialNo int, @grade decimal --improvised
 As
+update thesis 
+set thesis.grade = @grade
+where thesis.serial_num = @ThesisSerialNo;
+
 -- The grade to be inserted is needed???
 
 
