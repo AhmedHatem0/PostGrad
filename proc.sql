@@ -1,4 +1,70 @@
-﻿create proc AdminViewSupervisorProfile
+--Abdo
+create Proc StudentRegister 
+@first_name varchar(20),
+@last_name varchar(20),
+@password varchar(20),
+@faculty varchar(20),
+@Gucian bit,
+@email varchar(50),
+@address varchar(10)
+as 
+Insert Into Student (first_name,last_name,password,faculty,email,address) 
+values (@first_name,@last_name,@password,@faculty,@email,@address)
+Declare @ID int
+select @ID = ID from student where email = @email
+IF @gucian = 1 Insert Into GUCian(ID) values (@ID)
+else Insert Into non_GUCian(ID) values (@ID)
+
+--3 Admin 
+ 
+go 
+create proc AdminListSup
+As 
+select * from supervisor
+
+go
+create proc AdminViewAllTheses 
+As
+Select * from thesis
+
+go
+create proc AdminViewStudentThesisBySupervisor
+As 
+Select sv.first_name +sv.last_name as ' Supervisor name', t.title , std.first_name + std.last_name as 'Student name'
+from supervisor sv inner join make_under_supervision mus on sv.ID = mus.vid 
+inner join student std on std.ID = mus.sid 
+inner join thesis t on t.serial_num = mus.serial_num 
+
+go
+create proc AdminUpdateExtension
+@ThesisSerialNo int 
+as 
+update thesis 
+set thesis.num_extensions += 1 where thesis.serial_num = @ThesisSerialNo
+go
+create proc AdminViewStudentProfile
+@sid Int 
+As
+select * from student where student.ID = @sid
+
+go
+create proc AdminListAcceptPublication
+As 
+select P.title , Pt.serial_num from publication P inner join publicaton_of_thesis pt on p.title = pt.title
+where p.is_accepted = 'True'
+
+go
+create proc ViewExamSupDefense 
+@defenseDate datetime
+As
+select e.name from examiner e
+inner join evaluates eval on e.ID = eval.eid 
+where @defenseDate = eval.date
+select s.name from evaluates
+inner join make_under_supervision mus on eval.serial_num = mus.serial_num 
+inner join supervisor sv on sv.id = mus.vid where @defenseDate = eval.date
+--Abdo
+create proc AdminViewSupervisorProfile
 @supId int
 as 
 select * from supervisor 
