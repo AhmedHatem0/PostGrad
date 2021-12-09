@@ -276,7 +276,7 @@ create proc AddExaminer
 , @National bit,@fieldOfWork varchar(20)
 as
 insert into examiner(name, field_of_work, is_national) Values(@ExaminerName, @fieldOfWork, @National);
-insert into evaluates values(IDENT_CURRENT('testing'),@defenseDate,@ThesisSerialNo,null);
+insert into evaluates values(IDENT_CURRENT('examiner'),@defenseDate,@ThesisSerialNo,null);
 
 go
 
