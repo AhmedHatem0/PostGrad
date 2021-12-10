@@ -374,10 +374,33 @@ where serial_num = @ThesisSerialNo and date = @DefenseDate and eid = @examinerID
 
 go
 
-
-
-
 --6
+--a 
+go
+create proc viewMyProfile 
+@studentId int
+As 
+if(exists(select * from GucianStudent G where G.id = @studentId)) 
+select * from GUCianStudent where id = @studentId
+else
+select * from NonGUCianStudent where id = @studentId
+
+--b
+go
+create proc editMyProfile
+@studentID int,
+@firstName varchar(10),
+@lastName varchar(10),
+@password varchar(10),
+@email varchar(10),
+@address varchar(10),
+@type varchar(10)
+As
+if(exists(select * from GucianStudent G where G.id = @studentId)) 
+update GUCianStudent 
+set first_name = @firstName, last_name = @lastName,address = @address,type = @type where ID = @studentID
+update PostGradUser
+set email = @email, postGradUser.password = @password
 --c
 create proc addUndergradID
 @studentID int, @undergradID varchar(10)
@@ -385,7 +408,12 @@ as
 update GUCianStudent
 set UndergradID = @undergradID
 where ID = @studentID
-
+--d 
+go
+create proc ViewCoursesGrades
+@studentID int
+As
+select grade from NonGucianStudentTakeCourse where sid= @studentID
 go
 
 --e.1
