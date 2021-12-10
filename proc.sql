@@ -1,5 +1,5 @@
 
--- 1 a) 
+-- 1 a) Register to the website by using my name (First and last name), password, faculty, email, and address.
 create Proc StudentRegister 
 @first_name varchar(20),
 @last_name varchar(20),
@@ -9,15 +9,16 @@ create Proc StudentRegister
 @email varchar(50),
 @address varchar(50)
 as 
-Insert Into Student (first_name,last_name,password,faculty,email,address) 
-values (@first_name,@last_name,@password,@faculty,@email,@address)
-Declare @ID int
-select @ID = ID from student where email = @email
-IF @gucian = 1 Insert Into GUCian(ID) values (@ID)
-else Insert Into non_GUCian(ID) values (@ID)
+Insert Into PostGradUser(password,email) 
+values (@password,@email)
+IF @gucian = 1 
+Insert Into GUCianStudent(ID, first_name, last_name, faculty, address) 
+values (IDENT_CURRENT('PostGradUser'), @first_name, @last_name, @faculty, @address)
+else 
+Insert Into NonGUCianStudent(ID, first_name, last_name, faculty, address) 
+values (IDENT_CURRENT('PostGradUser'), @first_name, @last_name, @faculty, @address)
 
 go
---1a.2
 create proc SupervisorRegister
 @first_name varchar(20),
 @last_name varchar(20),
@@ -26,20 +27,10 @@ create proc SupervisorRegister
 @email varchar(50) 
 as 
 insert into PostGradUser(email,password) values(@email,@password)
-insert into supervisor values(IDENT_CURRENT('PostGradUser'),@faculty,@first_name+' '+@last_name);
+insert into supervisor values(IDENT_CURRENT('PostGradUser'),@faculty,@first_name);
 
-
+-- 2 a) login using my username and password.
 go
--- create proc SupervisorRegister
-
--- 2 a)
-
---2 registered user
---a
---user login with username and password, returning a success bit
-
-go
-
 CREATE FUNCTION userLogin (@ID int, @password varchar(20))
 RETURNS bit
 AS
@@ -56,11 +47,8 @@ begin
 	return @ret;
 end;
 
--- 2 b)
+-- 2 b) add my mobile number(s).
 go
---b
---given the ID of the user and his mobile number, it adds it to the database
-
 create proc addMobile
 @ID int, @mobile_number varchar(20)
 as
@@ -69,13 +57,13 @@ insert into GUCStudentPhoneNumber Values(@ID,@mobile_number);
 else
 insert into NonGUCStudentPhoneNumber Values(@ID,@mobile_number);
 
--- 3 a) 
+-- 3 a) List all supervisors in the system.
 go 
 create proc AdminListSup
 As 
 select * from supervisor
 
--- 3 b)
+-- 3 b) view the profile of any supervisor that contains all his/her information.
 go
 create proc AdminViewSupervisorProfile
 @supId int
@@ -83,13 +71,13 @@ as
 select * from supervisor 
 where id = @supId
 
--- 3 c)
+-- 3 c) List all Theses in the system.
 go
 create proc AdminViewAllTheses 
 As
 Select * from thesis
 
--- 3 d)
+-- 3 d) List the number of on going theses.
 go
 create proc AdminViewOnGoingTheses
 @thesesCount int output
@@ -98,25 +86,30 @@ select @thesesCount = count(*) from thesis
 where current_timestamp >= start_date and 
 (end_date is null or current_timestamp <= end_date)
 
--- 3 e)
+-- 3 e) List all supervisors’ names currently supervising students, theses title, student name
 go
 create proc AdminViewStudentThesisBySupervisor
 As 
-Select sv.first_name +sv.last_name as 'Supervisor name', t.title , std.first_name + std.last_name as 'Student name'
-from supervisor sv inner join make_under_supervision mus on sv.ID = mus.vid 
-inner join student std on std.ID = mus.sid 
-inner join thesis t on t.serial_num = mus.serial_num 
+Select sv.name, t.title , std.first_name +' '+ std.last_name as 'Student name'
+from supervisor sv inner join GUCianStudentRegisterThesis reg on sv.ID = reg.vid 
+inner join GUCianStudent std on std.ID = reg.sid 
+inner join thesis t on t.serial_num = reg.serial_num 
+union
+Select sv.name, t.title , std.first_name +' '+ std.last_name as 'Student name'
+from supervisor sv inner join NonGUCianStudentRegisterThesis reg on sv.ID = reg.vid 
+inner join NonGUCianStudent std on std.ID = reg.sid 
+inner join thesis t on t.serial_num = reg.serial_num
 
--- 3 f)
+-- 3 f) List nonGucians names, course code, and respective grade.
 go
 create proc AdminListNonGucianCourse
 @courseID int
 as
 select s.first_name+' '+s.last_name as name, c.code, t.grade 
-from student s, take_course t, course c
+from NonGUCianStudent s, NonGucianStudentTakeCourse t, course c
 where s.ID = t.sid and c.ID = t.cid and t.cid = @courseID
 
--- 3 g)
+-- 3 g) Update the number of thesis extension by 1.
 go
 create proc AdminUpdateExtension
 @ThesisSerialNo int 
@@ -124,30 +117,36 @@ as
 update thesis 
 set thesis.num_extensions += 1 where thesis.serial_num = @ThesisSerialNo
 
--- 3 h)
+-- 3 h) Issue a thesis payment.
 go
-create proc AdminIssueThesisPayment
+CREATE proc AdminIssueThesisPayment 
 @ThesisSerialNo int,
 @amount decimal,
 @noOfInstallments int,
 @fundPercentage decimal,
 @success bit output
-as
-if @ThesisSerialNo is null or @amount is null or @noOfInstallments is null or @fundPercentage is null
-set @success = 0
-else
-set @success = 1
-insert into payment (serial_num, total_amount, num_installments, fund_precentage) 
-values (@ThesisSerialNo, @amount, @noOfInstallments, @fundPercentage)
+AS
+if (exists(select * from thesis t where t.serial_num = @ThesisSerialNo))
+	begin
+		set @success = '1';
+		insert into payment(num_installments, total_amount, fund_precentage) 
+		values(@noOfInstallments, @amount, @fundPercentage)
+		update thesis 
+		set payment_ID = IDENT_CURRENT('payment')
+		where thesis.serial_num = @ThesisSerialNo
+	end
+else 
+	set @success = '0';
 
--- 3 i)
+
+-- 3 i) view the profile of any student that contains all his/her information.
 go
 create proc AdminViewStudentProfile
 @sid Int 
 As
 select * from student where student.ID = @sid
 
--- 3 j)
+-- 3 j) Issue installments as per the number of installments for a certain payment every six months starting from the entered date.
 go
 create proc AdminIssueInstallPayment
 @paymentID int, 
@@ -169,14 +168,14 @@ begin
 	set @cnt -= 1
 end
 
--- 3 k)
+-- 3 k) List the title(s) of accepted publication(s) per thesis.
 go
 create proc AdminListAcceptPublication
 As 
-select P.title , Pt.serial_num from publication P inner join publicaton_of_thesis pt on p.title = pt.title
+select P.title , Pt.serial_num from publication P inner join ThesisHasPublication pt on p.pubid = pt.pubid
 where p.is_accepted = 'True'
 
--- 3 l)
+-- 3 l) Add courses and link courses to students.
 go
 create proc AddCourse
 @courseCode varchar(10), 
@@ -191,7 +190,7 @@ create proc linkCourseStudent
 @courseID int,
 @studentID int
 as
-insert into take_course (sid, cid) 
+insert into nonNonGucianStudentTakeCourse(sid, cid) 
 values (@studentID, @courseID)
 
 go
@@ -200,23 +199,28 @@ create proc addStudentCourseGrade
 @studentID int, 
 @grade decimal
 as
-update take_course
+update NonGucianStudentTakeCourse
 set grade = @grade
 where sid = @studentID and cid = @courseID
 
--- 3 m)
+-- 3 m) View examiners and supervisor(s) names attending a thesis defense taking place on a certain date.
 go
 create proc ViewExamSupDefense 
 @defenseDate datetime
 As
 select e.name from examiner e
-inner join evaluates eval on e.ID = eval.eid 
+inner join ExaminerEvaluateDefense eval on e.ID = eval.eid 
 where @defenseDate = eval.date
-select s.name from evaluates
-inner join make_under_supervision mus on eval.serial_num = mus.serial_num 
-inner join supervisor sv on sv.id = mus.vid where @defenseDate = eval.date 
+union
+select sv.name from defense d
+inner join GUCianStudentRegisterThesis reg on d.serial_num = reg.serial_num 
+inner join supervisor sv on sv.id = reg.vid where @defenseDate = d.date 
+union
+select sv.name from defense d
+inner join NonGUCianStudentRegisterThesis reg on d.serial_num = reg.serial_num 
+inner join supervisor sv on sv.id = reg.vid where @defenseDate = d.date 
 
--- 4 a)
+-- 4 a) Evaluate a student’s progress report, and give evaluation value 0 to 3.
 go
 create proc EvaluateProgressReport
 @supervisorID int,
@@ -225,20 +229,30 @@ create proc EvaluateProgressReport
 @evaluation int
 as
 if(@evaluation<=3 and @evaluation>=0)
-	update progress_report
-	set evaluation = @evaluation , vid = @supervisorID 
-	where  serial_num = @thesisSerialNo and report_num = @progressReportNo;
-
--- 4 b)
+begin
+	update GucianProgressReport
+	set evaluation = @evaluation
+	where serial_num = @thesisSerialNo and report_num = @progressReportNo and vid = @supervisorID 
+	update NonGucianProgressReport
+	set evaluation = @evaluation
+	where serial_num = @thesisSerialNo and report_num = @progressReportNo and vid = @supervisorID 
+end
+-- 4 b) View all my students’s names and years spent in the thesis.
 go
 create proc ViewSupStudentsYears
 @supervisorID int
 as
-select s.first_name , s.last_name , t.years_spent from student s inner join make_under_supervision m on s.ID = m.sid
-inner join thesis t on t.serial_num = m.serial_num
-where m.vid = @supervisorID
+select s.first_name , s.last_name , t.years_spent 
+from GUCianStudent s inner join GUCianStudentRegisterThesis r on s.ID = r.sid
+inner join thesis t on t.serial_num = r.serial_num
+where r.vid = @supervisorID
+union
+select s.first_name , s.last_name , t.years_spent 
+from NonGUCianStudent s inner join NonGUCianStudentRegisterThesis r on s.ID = r.sid
+inner join thesis t on t.serial_num = r.serial_num
+where r.vid = @supervisorID
 
--- 4 c)
+-- 4 c) View my profile and update my personal information.
 go
 create proc SubViewProfile
 @supervisorID int
@@ -248,25 +262,39 @@ from supervisor
 where supervisor.ID = @supervisorID
 
 go
--- create proc UpdateSupProfile
+create proc UpdateSupProfile
+@supervisorID int,
+@name varchar(20),
+@faculty varchar(20)
+as
+update supervisor
+set name = @name, faculty = @faculty
+where ID = @supervisorID
 
-
--- 4 d)
+-- 4 d) View all publications of a student.
+go
 create proc ViewAllStudentPublications
 @StudentID int
 as
 select *
-from publication
-where sid = @StudentID
+from publication p inner join ThesisHasPublication tp on tp.pubid = p.pubid
+inner join GUCianStudentRegisterThesis reg on reg.serial_num = tp.serial_num
+where reg.sid = @StudentID
+union
+select *
+from publication p inner join ThesisHasPublication tp on tp.pubid = p.pubid
+inner join NonGUCianStudentRegisterThesis reg on reg.serial_num = tp.serial_num
+where reg.sid = @StudentID
 
--- 4 e)
+-- 4 e) Add defense for a thesis, for nonGucian students all courses’ grades should be greater than 50 percent.
 go
-create proc AdddefenseGucian
+create proc AddDefenseGucian
 @ThesisSerialNo int,
 @DefenseDate DateTime,
 @DefenseLocation varchar(15)
 as 
-insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
+insert into defense(date, serial_num, location) 
+values(@DefenseDate, @ThesisSerialNo, @DefenseLocation)
 
 go
 create proc AddDefenseNonGucian
@@ -276,42 +304,43 @@ create proc AddDefenseNonGucian
 as 
 declare @min int
 select @min = min(t.grade) 
-from take_course t inner join make_under_supervision m on m.sid = t.sid
+from NonGucianStudentTakeCourse t inner join NonGUCianStudentRegisterThesis m on m.sid = t.sid
 where m.serial_num = @ThesisSerialNo
 if(@min > 50)
 insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
 
 go
---f
---inserting an examiner in the examiner table and to his assigned thesis evaluation
+-- 4 f) inserting an examiner in the examiner table and to his assigned thesis evaluation
 create proc AddExaminer
-@ThesisSerialNo int, @DefenseDate Datetime, @ExaminerName varchar(20)
-, @National bit,@fieldOfWork varchar(20)
+@ThesisSerialNo int,
+@DefenseDate Datetime,
+@ExaminerName varchar(20),
+@National bit,
+@fieldOfWork varchar(20)
 as
 insert into examiner(name, field_of_work, is_national) Values(@ExaminerName, @fieldOfWork, @National);
-insert into evaluates values(IDENT_CURRENT('examiner'),@defenseDate,@ThesisSerialNo,null);
+insert into ExaminerEvaluateDefense values(IDENT_CURRENT('examiner'),@defenseDate,@ThesisSerialNo,null);
 
+-- 4 g) deleteing a thesis if the evaluation of its last progress report is zero
 go
-
---4g
---deleteing a thesis if the evaluation of its last progress report is zero
 create proc CancelThesis
 @ThesisSerialNo int
 As
-if(exists( select * from progress_report PR where PR.serial_num = @ThesisSerialNo and PR.date = max(PR.date) and PR.evaluation = 0))
+if(exists(select * from GucianProgressReport PR where PR.serial_num = @ThesisSerialNo and PR.date = max(PR.date) and PR.evaluation = 0))
 delete from thesis
-where thesis.serial_num = @ThesisSerialNo;
+where thesis.serial_num = @ThesisSerialNo
+if(exists(select * from NonGucianProgressReport PR where PR.serial_num = @ThesisSerialNo and PR.date = max(PR.date) and PR.evaluation = 0))
+delete from thesis
+where thesis.serial_num = @ThesisSerialNo
 
 go
---4h
--- adding a grade to a thesis
+--4 h) adding a grade to a thesis
 create proc AddGrade
-@ThesisSerialNo int, @grade decimal --improvised
+@ThesisSerialNo int,
+@grade decimal --improvised
 As
 update thesis 
 set thesis.grade = @grade
 where thesis.serial_num = @ThesisSerialNo;
 
 -- The grade to be inserted is needed???
-
-
