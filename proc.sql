@@ -468,3 +468,28 @@ if(exists(select sid = @studentID from GUCianStudentRegisterThesis where serial_
 insert into GucianProgressReport(sid,date,serial_num) values();
 else
 insert into NonGucianProgressReport values();
+
+--h
+go 
+CREATE proc ViewEvalProgressReport
+@thesisSerialNo int, @progressReportNo int
+AS
+SELECT * FROM GucianProgressReport G where G.serial_num=@thesisSerialNo AND report_num=@progressReportNo
+UNION 
+SELECT * FROM NonGucianProgressReport G where G.serial_num=@thesisSerialNo AND report_num=@progressReportNo
+--i
+
+go
+CREATE proc addPublication
+ @title varchar(50), @pubDate datetime, @host varchar(50), 
+ @place varchar(50), @accepted bit
+ AS
+ insert into publication values(@title,@host,@place,@pubdate,@accepted)
+
+--j
+
+go
+CREATE proc linkPubThesis
+@pubId int, @thesisSerialNo int 
+As
+insert into ThesisHasPublication VALUES(@PubID,@thesisSerialNo)
