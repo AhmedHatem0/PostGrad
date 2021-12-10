@@ -326,10 +326,14 @@ go
 create proc CancelThesis
 @ThesisSerialNo int
 As
-if(exists(select * from GucianProgressReport PR where PR.serial_num = @ThesisSerialNo and PR.date = max(PR.date) and PR.evaluation = 0))
+if(exists(select * from GucianProgressReport PR 
+where PR.serial_num = @ThesisSerialNo and PR.evaluation = 0 and
+PR.date >= all (select date from GucianProgressReport pr2 where pr2.serial_num = @ThesisSerialNo)))
 delete from thesis
 where thesis.serial_num = @ThesisSerialNo
-if(exists(select * from NonGucianProgressReport PR where PR.serial_num = @ThesisSerialNo and PR.date = max(PR.date) and PR.evaluation = 0))
+if(exists(select * from NonGucianProgressReport PR 
+where PR.serial_num = @ThesisSerialNo and PR.evaluation = 0 and
+PR.date >= all (select date from NonGucianProgressReport pr2 where pr2.serial_num = @ThesisSerialNo)))
 delete from thesis
 where thesis.serial_num = @ThesisSerialNo
 
