@@ -9,7 +9,7 @@ ID int Primary key identity,
 foreign key(ID) references PostGradUser)
 
 create table GUCianStudent(
-ID int primary key ,
+ID int primary key,
 first_name Varchar(20),
 last_name varchar(20),
 faculty varchar(20),
@@ -97,7 +97,7 @@ primary key(date ,serial_num),
 foreign key(serial_num) references thesis)
 
 create table GucianProgressReport(
-report_num int,
+report_num int identity,
 sid int,
 date datetime,
 evaluation int,
@@ -111,7 +111,7 @@ foreign key(sid) references GUCianStudent,
 foreign key(vid) references supervisor)
 
 create table NonGucianProgressReport(
-report_num int,
+report_num int identity,
 sid int,
 date datetime,
 evaluation int,
