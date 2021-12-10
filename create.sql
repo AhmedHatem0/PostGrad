@@ -6,7 +6,7 @@ password varchar(20))
 
 create table admin(
 ID int Primary key identity,
-foreign key(ID) references PostGradUser )
+foreign key(ID) references PostGradUser)
 
 create table GUCianStudent(
 ID int primary key ,
@@ -70,21 +70,23 @@ num_extensions int,
 payment_ID int,
 grade decimal,
 defenseDate datetime,
-years_spent as year(end_date) -year(start_date),
+years_spent as year(end_date) - year(start_date),
 foreign key(payment_ID) references payment)
 
 create table publication (
-title varchar(50) primary key ,
+pubid int primary key identity,
+title varchar(50),
 host varchar(50),
 place varchar(50),
-pub_date datetime ,
+pub_date datetime,
 is_accepted bit)
 
 create table examiner(
-ID int primary key Identity,
+ID int primary key,
 name varchar(20),
 field_of_work varchar(20),
-is_national bit)
+is_national bit
+foreign key(ID) references PostGradUser)
 
 create table defense(
 date datetime,
@@ -121,12 +123,11 @@ foreign key(sid) references NonGUCianStudent,
 foreign key(vid) references supervisor)
 
 create table installment(
-installment_num int,
 pid int,
 date datetime,
 status bit,
 amount decimal,
-primary key(installment_num,pid),
+primary key(date,pid),
 foreign key(pid) references payment)
 
 create table NonGucianStudentPayForCourse(
@@ -175,7 +176,7 @@ foreign key(date,serial_num) references defense)
 
 create table ThesisHasPublication(
 serial_num int,
-title varchar(50),
-primary key(serial_num, title),
+pubid int,
+primary key(serial_num, pubid),
 foreign key(serial_num) references thesis,
-foreign key(title) references publication )
+foreign key(pubid) references publication)
