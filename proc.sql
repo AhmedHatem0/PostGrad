@@ -348,3 +348,95 @@ set thesis.grade = @grade
 where thesis.serial_num = @ThesisSerialNo;
 
 -- The grade to be inserted is needed???
+
+
+--5 examiner
+--a
+--adding a grade for a defense given the date of the defense and its thesis's serial number
+go
+create proc AddDefenseGrade
+@ThesisSerialNo int, @DefenseDate Datetime, @grade decimal
+as
+update defense
+set defense.grade = @grade
+where defense.serial_num = @ThesisSerialNo and defense.date = @DefenseDate
+
+go
+
+--b
+--adding comments on a specific defense by an examiner
+create proc AddCommentsGrade
+@ThesisSerialNo int, @DefenseDate Datetime, @comments varchar(300), @examinerID int
+as
+update ExaminerEvaluateDefense
+set Comment = @comments
+where serial_num = @ThesisSerialNo and date = @DefenseDate and eid = @examinerID
+
+go
+
+
+
+
+--6
+--c
+create proc addUndergradID
+@studentID int, @undergradID varchar(10)
+as
+update GUCianStudent
+set UndergradID = @undergradID
+where ID = @studentID
+
+go
+
+--e.1
+create proc ViewCoursePaymentsInstall
+@studentID int
+as
+select P.* , I.*
+from NonGucianStudentPayForCourse NG inner join payment P on NG.payment_num = P.ID
+	inner join installment I on NG.payment_num = I.pid
+where NG.sid = @studentID
+
+go
+--e.2
+create proc ViewThesisPaymentsInstall
+@studentID int
+as
+select P.* , I.*
+from ( (select NG.sid, NG.serial_num from NonGUCianStudentRegisterThesis NG) union
+(select G.sid, G.serial_num from GUCianStudentRegisterThesis G)) S inner join thesis T on T.serial_num = S.serial_num
+inner join payment P on P.ID = T.payment_ID inner join installment I on I.pid = P.ID
+where S.sid = @studentID
+
+go
+--e.3
+create proc ViewUpcomingInstallments
+@studentID int
+as
+select I.*
+from ( (select NG.sid, NG.serial_num from NonGUCianStudentRegisterThesis NG) union
+(select G.sid, G.serial_num from GUCianStudentRegisterThesis G)) S inner join thesis T on T.serial_num = S.serial_num
+inner join installment I on I.pid = T.payment_ID
+where I.date> CURRENT_TIMESTAMP
+
+go
+--e.4
+create proc ViewMisedInstallments
+@studentID int
+as
+select I.*
+from ( (select NG.sid, NG.serial_num from NonGUCianStudentRegisterThesis NG) union
+(select G.sid, G.serial_num from GUCianStudentRegisterThesis G)) S inner join thesis T on T.serial_num = S.serial_num
+inner join installment I on I.pid = T.payment_ID
+where I.date< CURRENT_TIMESTAMP and I.status = '0'
+
+go
+--f.1
+create proc AddProgressReport
+@thesisSerialNo int, @progressReportDate date
+as
+declare @studentID int
+if(exists(select sid = @studentID from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo))
+insert into GucianProgressReport(sid,date,serial_num) values();
+else
+insert into NonGucianProgressReport values();
