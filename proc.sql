@@ -402,6 +402,7 @@ set first_name = @firstName, last_name = @lastName,address = @address,type = @ty
 update PostGradUser
 set email = @email, postGradUser.password = @password
 --c
+go 
 create proc addUndergradID
 @studentID int, @undergradID varchar(10)
 as
@@ -461,35 +462,70 @@ where I.date< CURRENT_TIMESTAMP and I.status = '0'
 go
 --f.1
 create proc AddProgressReport
-@thesisSerialNo int, @progressReportDate date
+@thesisSerialNo int,
+@progressReportDate date
 as
 declare @studentID int
-if(exists(select sid = @studentID from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo))
-insert into GucianProgressReport(sid,date,serial_num) values();
+if(exists(select sid from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo))
+begin
+select @studentID = sid from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo
+insert into GucianProgressReport(sid,date,serial_num) values(@studentID,@progressReportDate, @thesisSerialNo);
+end
 else
-insert into NonGucianProgressReport values();
+begin
+select  @studentID = sid from NonGUCianStudentRegisterThesis where serial_num = @thesisSerialNo
+insert into NonGucianProgressReport(sid,date,serial_num) values(@studentID,@progressReportDate,@thesisSerialNo);
+end
 
---h
+--f.2
+go
+create proc FillProgressReport 
+@thesisSerialNo int,
+@progressReportNo int, 
+@state int,
+@description varchar(200)
+As
+declare @studentID int
+declare @supID int
+if(exists(select sid from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo))
+begin
+select @studentID = sid, @supID = vid from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo
+update GuianProgressReport 
+set progress_state = @state, vid = @supID,description = @description where report_num = @progressReportNo and SID = @studentID
+end
+else
+begin
+select  @studentID = sid, @supID = vid from NonGUCianStudentRegisterThesis where serial_num = @thesisSerialNo
+update NonGuianProgressReport 
+set progress_state = @state, vid = @supID,description = @description where report_num = @progressReportNo and SID = @studentID
+end
+
+--g  WRONG -- TO BE MODIFIED
 go 
 CREATE proc ViewEvalProgressReport
 @thesisSerialNo int, @progressReportNo int
 AS
-SELECT * FROM GucianProgressReport G where G.serial_num=@thesisSerialNo AND report_num=@progressReportNo
+SELECT evaluation FROM GucianProgressReport G where G.serial_num=@thesisSerialNo AND report_num=@progressReportNo
 UNION 
-SELECT * FROM NonGucianProgressReport G where G.serial_num=@thesisSerialNo AND report_num=@progressReportNo
---i
+SELECT evaluation FROM NonGucianProgressReport G where G.serial_num=@thesisSerialNo AND report_num=@progressReportNo
+--h
 
 go
 CREATE proc addPublication
- @title varchar(50), @pubDate datetime, @host varchar(50), 
- @place varchar(50), @accepted bit
+ @title varchar(50),
+ @pubDate datetime,
+ @host varchar(50), 
+ @place varchar(50),
+ @accepted bit
  AS
- insert into publication values(@title,@host,@place,@pubdate,@accepted)
+ insert into publication(
+title ,host ,place ,pub_date,is_accepted) 
+values(@title,@host,@place,@pubdate,@accepted)
 
---j
+--i
 
 go
 CREATE proc linkPubThesis
 @pubId int, @thesisSerialNo int 
 As
-insert into ThesisHasPublication VALUES(@PubID,@thesisSerialNo)
+insert into ThesisHasPublication VALUES(@thesisSerialNo,@PubID)
