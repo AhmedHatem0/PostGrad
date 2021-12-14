@@ -500,7 +500,7 @@ update NonGuianProgressReport
 set progress_state = @state, vid = @supID,description = @description where report_num = @progressReportNo and SID = @studentID
 end
 
---g  WRONG -- TO BE MODIFIED
+--g 
 go 
 CREATE proc ViewEvalProgressReport
 @thesisSerialNo int, @progressReportNo int

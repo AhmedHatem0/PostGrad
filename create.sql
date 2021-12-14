@@ -182,3 +182,4 @@ pubid int,
 primary key(serial_num, pubid),
 foreign key(serial_num) references thesis,
 foreign key(pubid) references publication)
+ 
