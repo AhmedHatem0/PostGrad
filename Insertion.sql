@@ -46,9 +46,3 @@ set type = @type where @ID = ID
 end
 
 
-
-
-
-
-exec StudentRegister 'abdelrahman', 'Hussein', '123456789','Engineering',
-'1', 'abdel-rahman.mahmoud', 'Suez'

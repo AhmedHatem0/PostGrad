@@ -60,7 +60,7 @@ total_amount decimal,
 fund_precentage decimal)
 
 create table thesis (
-serial_num int primary key,
+serial_num int primary key identity,
 field varchar(50),
 start_date datetime ,
 end_date datetime,
