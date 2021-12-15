@@ -1,4 +1,5 @@
---create Database postgrad_office
+--drop database postgrad_office
+create Database postgrad_office
 create table PostGradUser(
 ID int primary Key Identity,
 email varchar(50),
@@ -14,7 +15,7 @@ first_name Varchar(20),
 last_name varchar(20),
 faculty varchar(20),
 type Varchar(10),
-GPA decimal,
+GPA decimal(5,2),
 address varchar(50),
 UndergradID varchar(10),
 foreign key(ID) references PostGradUser)
@@ -25,7 +26,7 @@ first_name Varchar(20),
 last_name varchar(20),
 faculty varchar(20),
 type Varchar(10),
-GPA decimal,
+GPA decimal(5,2),
 address varchar(50),
 foreign key(ID) references PostGradUser)
 
@@ -62,8 +63,8 @@ fund_precentage decimal)
 create table thesis (
 serial_num int primary key identity,
 field varchar(50),
-start_date datetime ,
-end_date datetime,
+start_date date,
+end_date date,
 title varchar(50),
 type varchar(50),
 num_extensions int,
@@ -78,7 +79,7 @@ pubid int primary key identity,
 title varchar(50),
 host varchar(50),
 place varchar(50),
-pub_date datetime,
+pub_date date,
 is_accepted bit)
 
 create table examiner(
@@ -99,7 +100,7 @@ foreign key(serial_num) references thesis)
 create table GucianProgressReport(
 report_num int identity,
 sid int,
-date datetime,
+date date,
 evaluation int,
 progress_state int,
 serial_num int,
@@ -113,7 +114,7 @@ foreign key(vid) references supervisor)
 create table NonGucianProgressReport(
 report_num int identity,
 sid int,
-date datetime,
+date date,
 evaluation int,
 progress_state int,
 serial_num int,
