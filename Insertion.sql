@@ -58,7 +58,7 @@ values
 ('Law', 'PHD', 'Analysis of Welfare Politics in Japan', '9/9/2020', '6/10/2025'),
 ('Business', 'MSC', 'Important aspects of workforce regulations', '1/24/2019', '4/25/2020'),
 ('Engineering', 'PHD', 'Self-driving automobiles', '5/20/2019', '9/9/2024'),
-('Engineering', 'MSC', 'What is the future of the Internet?', '8/20/2019', '9/9/2020'),
-('Computer Science', 'MSC', 'Health problems caused by service time', '8/8/2017', '10/10/2018'),
+('Computer Science', 'MSC', 'What is the future of the Internet?', '8/20/2019', '9/9/2020'),
+('Medicine', 'MSC', 'Health problems caused by service time', '8/8/2017', '10/10/2018'),
 ('Art', 'PHD', 'Ancient Greek Sculpture and Its Peculiarities', '11/11/2020', '11/11/2024'),
 ('Business', 'MSC', 'How to motivate employees?', '6/6/2019', '5/5/2020')
