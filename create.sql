@@ -1,5 +1,7 @@
 --drop database postgrad_office
 create Database postgrad_office
+go
+use postgrad_office
 create table PostGradUser(
 ID int primary Key Identity,
 email varchar(50),
@@ -7,7 +9,7 @@ password varchar(20))
 
 create table admin(
 ID int Primary key,
-foreign key(ID) references PostGradUser)
+foreign key(ID) references PostGradUser on delete cascade on update cascade)
 
 create table GUCianStudent(
 ID int primary key,
@@ -18,7 +20,7 @@ type Varchar(10),
 GPA decimal(5,2),
 address varchar(50),
 UndergradID varchar(10),
-foreign key(ID) references PostGradUser)
+foreign key(ID) references PostGradUser on delete cascade on update cascade)
 
 create table NonGUCianStudent(
 ID int primary key ,
@@ -26,39 +28,39 @@ first_name Varchar(20),
 last_name varchar(20),
 faculty varchar(20),
 type Varchar(10),
-GPA decimal(5,2),
+GPA numeric(5,2),
 address varchar(50),
-foreign key(ID) references PostGradUser)
+foreign key(ID) references PostGradUser on delete cascade on update cascade)
 
 create table GUCStudentPhoneNumber(
 id int,
 mobile_number varchar(20),
 primary key(id,mobile_number),
-foreign key(id) references GUCianStudent)
+foreign key(id) references GUCianStudent on delete cascade on update cascade)
 
 create table NonGUCStudentPhoneNumber(
 id int,
 mobile_number varchar(20),
 primary key(id,mobile_number),
-foreign key(id) references NonGUCianStudent)
+foreign key(id) references NonGUCianStudent on delete cascade on update cascade)
 
 create table Course( 
 ID int primary key identity,
 credit_hours int,
 code varchar(10),
-fees decimal)
+fees decimal(15,2))
 
 create table supervisor(
 ID int primary key ,
 faculty varchar(20), 
 name Varchar(20),
-foreign key(ID) references PostGradUser )
+foreign key(ID) references PostGradUser on delete cascade on update cascade)
 
 create table payment (
-ID int primary key,
+ID int primary key identity,
 num_installments int,
-total_amount decimal,
-fund_precentage decimal)
+total_amount decimal(15,2),
+fund_precentage decimal(5,2))
 
 create table thesis (
 serial_num int primary key identity,
@@ -69,10 +71,10 @@ title varchar(50),
 type varchar(50),
 num_extensions int,
 payment_ID int,
-grade decimal,
+grade decimal(5,2),
 defenseDate datetime,
 years_spent as year(end_date) - year(start_date),
-foreign key(payment_ID) references payment)
+foreign key(payment_ID) references payment on delete cascade on update cascade)
 
 create table publication (
 pubid int primary key identity,
@@ -87,15 +89,15 @@ ID int primary key,
 name varchar(20),
 field_of_work varchar(20),
 is_national bit
-foreign key(ID) references PostGradUser)
+foreign key(ID) references PostGradUser on delete cascade on update cascade)
 
 create table defense(
 date datetime,
 serial_num int,
-grade decimal,
+grade decimal(5,2),
 location varchar(15),
 primary key(date ,serial_num),
-foreign key(serial_num) references thesis)
+foreign key(serial_num) references thesis on delete cascade on update cascade)
 
 create table GucianProgressReport(
 report_num int identity,
@@ -129,26 +131,26 @@ create table installment(
 pid int,
 date datetime,
 status bit,
-amount decimal,
+amount decimal(15,2),
 primary key(date,pid),
-foreign key(pid) references payment)
+foreign key(pid) references payment on delete cascade on update cascade)
 
 create table NonGucianStudentPayForCourse(
 payment_num int,
 sid int,
 cid int,
 Primary key(payment_num,sid,cid),
-foreign key(payment_num) references Payment,
-foreign key(sid) references NonGucianStudent,
-foreign key(cid) references Course)
+foreign key(payment_num) references Payment on delete cascade on update cascade,
+foreign key(sid) references NonGucianStudent on delete cascade on update cascade,
+foreign key(cid) references Course on delete cascade on update cascade)
 
 create table NonGucianStudentTakeCourse(
 sid int,
 cid int,
-grade decimal,
+grade decimal(5,2),
 primary key(sid,cid),
-foreign key(sid) references NonGucianStudent,
-foreign key(cid) references course)
+foreign key(sid) references NonGucianStudent on delete cascade on update cascade,
+foreign key(cid) references course on delete cascade on update cascade)
 
 create table GUCianStudentRegisterThesis(
 sid int,
@@ -174,13 +176,13 @@ date datetime,
 serial_num int,
 Comment varchar(300),
 primary key(eid,date,serial_num),
-foreign key(eid) references examiner,
-foreign key(date,serial_num) references defense)
+foreign key(eid) references examiner on delete cascade on update cascade,
+foreign key(date,serial_num) references defense on delete cascade on update cascade)
 
 create table ThesisHasPublication(
 serial_num int,
 pubid int,
 primary key(serial_num, pubid),
-foreign key(serial_num) references thesis,
-foreign key(pubid) references publication)
+foreign key(serial_num) references thesis on delete cascade on update cascade,
+foreign key(pubid) references publication on delete cascade on update cascade)
  
