@@ -27,7 +27,7 @@ create proc SupervisorRegister
 @email varchar(50) 
 as 
 insert into PostGradUser(email,password) values(@email,@password)
-insert into supervisor values(IDENT_CURRENT('PostGradUser'),@faculty,@first_name+ ' '+@last_name);
+insert into supervisor values(IDENT_CURRENT('PostGradUser'),@faculty,@first_name);
 
 -- 2 a) login using my username and password.
 go
@@ -121,9 +121,9 @@ set thesis.num_extensions += 1 where thesis.serial_num = @ThesisSerialNo
 go
 CREATE proc AdminIssueThesisPayment 
 @ThesisSerialNo int,
-@amount decimal,
+@amount decimal(15,2),
 @noOfInstallments int,
-@fundPercentage decimal,
+@fundPercentage decimal(5,2),
 @success bit output
 AS
 if (exists(select * from thesis t where t.serial_num = @ThesisSerialNo))
@@ -137,7 +137,7 @@ if (exists(select * from thesis t where t.serial_num = @ThesisSerialNo))
 	end
 else 
 	set @success = '0';
-
+print(@success)
 
 -- 3 i) view the profile of any student that contains all his/her information.
 go
@@ -153,8 +153,8 @@ create proc AdminIssueInstallPayment
 @InstallStartDate date
 as
 declare @cnt int
-declare @amount int
-declare @sum int
+declare @amount decimal(15,2)
+declare @sum decimal(15,2)
 declare @date date
 set @date = @InstallStartDate
 select @cnt = num_installments from payment where ID = @paymentID
@@ -163,7 +163,7 @@ set @amount = @sum/@cnt
 while(@cnt > 0)
 begin
 	insert into installment (pid, date, status, amount)
-	values (@paymentID, @date, 0, @amount)
+	values (@paymentID, @date, '0', @amount)
 	set @date = DATEADD(month, 6, @date)
 	set @cnt -= 1
 end
@@ -180,7 +180,7 @@ go
 create proc AddCourse
 @courseCode varchar(10), 
 @creditHrs int, 
-@fees decimal
+@fees decimal(15,2)
 as
 insert into course (code, credit_hours, fees) 
 values (@courseCode, @creditHrs, @fees)
@@ -197,7 +197,7 @@ go
 create proc addStudentCourseGrade
 @courseID int, 
 @studentID int, 
-@grade decimal
+@grade decimal(5,2)
 as
 update NonGucianStudentTakeCourse
 set grade = @grade
@@ -211,11 +211,11 @@ As
 select e.name from examiner e
 inner join ExaminerEvaluateDefense eval on e.ID = eval.eid 
 where @defenseDate = eval.date
-union
+union all
 select sv.name from defense d
 inner join GUCianStudentRegisterThesis reg on d.serial_num = reg.serial_num 
 inner join supervisor sv on sv.id = reg.vid where @defenseDate = d.date 
-union
+union all
 select sv.name from defense d
 inner join NonGUCianStudentRegisterThesis reg on d.serial_num = reg.serial_num 
 inner join supervisor sv on sv.id = reg.vid where @defenseDate = d.date 
@@ -342,7 +342,7 @@ go
 --4 h) adding a grade to a thesis
 create proc AddGrade
 @ThesisSerialNo int,
-@grade decimal --improvised
+@grade decimal(5,2) --improvised
 As
 update thesis 
 set thesis.grade = @grade
@@ -356,7 +356,7 @@ where thesis.serial_num = @ThesisSerialNo;
 --adding a grade for a defense given the date of the defense and its thesis's serial number
 go
 create proc AddDefenseGrade
-@ThesisSerialNo int, @DefenseDate Datetime, @grade decimal
+@ThesisSerialNo int, @DefenseDate Datetime, @grade decimal(5,2)
 as
 update defense
 set defense.grade = @grade
