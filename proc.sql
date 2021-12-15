@@ -27,7 +27,7 @@ create proc SupervisorRegister
 @email varchar(50) 
 as 
 insert into PostGradUser(email,password) values(@email,@password)
-insert into supervisor values(IDENT_CURRENT('PostGradUser'),@faculty,@first_name);
+insert into supervisor values(IDENT_CURRENT('PostGradUser'),@faculty,@first_name+ ' '+@last_name);
 
 -- 2 a) login using my username and password.
 go

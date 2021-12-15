@@ -5,7 +5,7 @@ email varchar(50),
 password varchar(20))
 
 create table admin(
-ID int Primary key identity,
+ID int Primary key,
 foreign key(ID) references PostGradUser)
 
 create table GUCianStudent(
