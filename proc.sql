@@ -318,8 +318,9 @@ create proc AddExaminer
 @National bit,
 @fieldOfWork varchar(20)
 as
-insert into examiner(name, field_of_work, is_national) Values(@ExaminerName, @fieldOfWork, @National);
-insert into ExaminerEvaluateDefense values(IDENT_CURRENT('examiner'),@defenseDate,@ThesisSerialNo,null);
+declare @ID int
+select @id = ID from examiner where is_national = @National and @fieldOfWork = field_of_work and @ExaminerName = name
+insert into ExaminerEvaluateDefense values(@ID,@defenseDate,@ThesisSerialNo,null);
 
 -- 4 g) deleteing a thesis if the evaluation of its last progress report is zero
 go

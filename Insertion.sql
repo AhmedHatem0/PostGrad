@@ -1,4 +1,4 @@
-﻿Create proc AddExaminer
+﻿Create proc AddNewExaminer
 @name varcHAR(20),
 @fieldOfWork VARCHAR(20) ,
 @isNational bit,
