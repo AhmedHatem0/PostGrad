@@ -1,124 +1,191 @@
-Create proc AddNewExaminer
-@name varchar(20),
-@fieldOfWork VARCHAR(20),
-@isNational bit,
-@email varchar(50),
-@password varchar(20)
-As
-insert into PostGradUser Values (@email, @password)
-insert into Examiner Values (IDENT_CURRENT('PostGradUser'),@name, @fieldOfWork,@isNational)
+use postgrad_office
 
-go
-
-create proc AddAdmin @email varchar(50) ,@password varchar(20)
-as 
-insert into PostGradUser Values (@email, @password)
-insert into Admin Values (IDENT_CURRENT('PostGradUser'))
-
-go 
-create proc AddGPA  @ID int , @GPA decimal(5,2)
-As 
-if Exists(select * from GUCianStudent where @ID = ID)
-begin
-update GUCianStudent 
-set GPA = @Gpa where @ID = ID 
-end
-Else
-if Exists(select * from NonGUCianStudent where @ID = ID)
-begin
-update NonGUCianStudent 
-set GPA = @Gpa where @ID = ID 
-end
-
-go
-create proc AddType @ID int , @type varchar(10)
-As 
-if Exists(select * from GUCianStudent where @ID = ID)
-begin
-update GUCianStudent 
-set type = @type where @ID = ID 
-end
-Else
-if Exists(select * from NonGUCianStudent where @ID = ID)
-begin
-update NonGUCianStudent 
-set type = @type where @ID = ID 
-end
-
-go
-Exec StudentRegister 'Abdelrahman','Hussein','531828946','Engineering','1',
-'abdel-rahman.mahmoud@studnet.guc.edu.eg','Egypt,Suez,Fasil,Al-Amal'
 declare @ID int
-set @ID = IDENT_CURRENT('PostGradUser')
-exec AddGPA @ID , 1.08
-exec AddType @ID ,'MSC'
 
-go
-Exec StudentRegister 'Ahmed','Hatem','15156295235','Engineering','1',
-'Ahmed.Semeda@studnet.guc.edu.eg','Egypt,Fayoum,Fayoum City'
-declare @ID int
-set @ID = IDENT_CURRENT('PostGradUser')
-exec AddGPA @ID , 0.81
-exec AddType @ID ,'MSC'
+insert into PostGradUser values('abdel-rahman.mahmoud@studnet.guc.edu.eg','531828946') 
+set @ID = IDENT_CURRENT('PostGradUser') --1
+insert into GUCianStudent values (@ID,'Abdelrahman','Hussein','Engineering','MSC',1.08,'Egypt,Suez,Fasil,Al-Amal','49-17771')
+insert into GUCStudentPhoneNumber values (@ID,'01001553355')
 
-go
-Exec StudentRegister 'Kareem','Eid','zjdfiosd$$@284','Engineering','1',
-'Kareem.Eid@studnet.guc.edu.eg','Egypt,Damietta,New Damietta'
-declare @ID int
-set @ID = IDENT_CURRENT('PostGradUser')
-exec AddGPA @ID , 0.77
-exec AddType @ID ,'PHD'
+insert into PostGradUser values('Ahmed.Semeda@studnet.guc.edu.eg','15156295235') 
+set @ID = IDENT_CURRENT('PostGradUser') --2
+insert into GUCianStudent values (@ID,'Ahmed','Hatem','Engineering','MSC',0.81,'Egypt,Fayoum,Fayoum City','49-19696')
 
-go
-Exec StudentRegister 'Asem','Sameih','454716154184','Pharmacy','1',
-'Asem.Sameih@studnet.guc.edu.eg','Egypt,Kafr El-Sheikh,El-Zohour district'
-declare @ID int
-set @ID = IDENT_CURRENT('PostGradUser')
-exec AddGPA @ID , 1.20
-exec AddType @ID ,'PHD'
+insert into PostGradUser values('Kareem.Eid@studnet.guc.edu.eg','zjdfiosd$$@284') 
+set @ID = IDENT_CURRENT('PostGradUser') --3
+insert into GUCianStudent values (@ID,'Kareem','Eid','Engineering','PHD',0.77,'Egypt,Damietta,New Damietta','49-19194')
 
-exec AddAdmin 'Mona.Farouk@guc.edu.eg', 'kzjfokjsovm54694'
+insert into PostGradUser values('Asem.Sameih@studnet.guc.edu.eg','454716154184') 
+set @ID = IDENT_CURRENT('PostGradUser') --4
+insert into GUCianStudent values (@ID,'Asem','Sameih','Pharmacy','PHD',1.2,'Egypt,Kafr El-Sheikh','49-1485')
 
-exec SupervisorRegister 'Mervat','Abuelkheir',
-'sdpsdosdmksdf6265151','MET','Mervat.Abuelkheir@guc.edu.eg'
+insert into PostGradUser values('Youmna.Ayman@studnet.guc.edu.eg','159753yyyy') 
+set @ID = IDENT_CURRENT('PostGradUser') --5
+insert into GUCianStudent values (@ID,'Youmna','Ayman','Law','MSC',2.3,'Egypt,Cairo,Rehab city','37-1234')
 
-exec SupervisorRegister 'Haytham','Ismail',
-'sdppokdpotksdfo1','MET','Haytham.Ismail@guc.edu.eg'
+insert into PostGradUser values('Youssef.Mahmoud@studnet.guc.edu.eg','24682468$$') 
+set @ID = IDENT_CURRENT('PostGradUser') --6
+insert into GUCianStudent values (@ID,'Youssef','Mahmoud','Applied Arts','PHD',0.98,'Egypt,Cairo,Maadi','43-11228')
 
-exec SupervisorRegister 'Amr','EL-mougy',
-'pdofpsdkfvlxm6626posgsdv','MET','Amr.El-Mougy@guc.edu.eg'
+insert into PostGradUser values('Aya.Ibrahim@studnet.guc.edu.eg','ay<3<3ay') 
+set @ID = IDENT_CURRENT('PostGradUser') --7
+insert into GUCianStudent values (@ID,'Aya','Ibrahim','Applied Arts','MSC',1.3,'Egypt,Alexandria','40-15204')
+-----------------------------------------------------
+insert into PostGradUser values('Amr.Omran@gmail.com','aoaooa2205') 
+set @ID = IDENT_CURRENT('PostGradUser') --8
+insert into NonGUCianStudent values (@ID,'Amr','Omran','Engineering','MSC',3.0,'Egypt,Cairo,Zamalek')
+insert into NonGUCStudentPhoneNumber values (@ID,'01001259999')
 
-exec SupervisorRegister 'Yasmin','Mohammed',
-'loskdfpo15065','Pharmacy','Yasmin.Mohammed@guc.edu.eg'
+insert into PostGradUser values('Yara.Ahmed@gmail.com','abcd12345') 
+set @ID = IDENT_CURRENT('PostGradUser') --9
+insert into NonGUCianStudent values (@ID,'Yara','Ahmed','Applied Arts','PHD',3.78,'Egypt,Alexandria')
 
-exec SupervisorRegister 'Osama','Hany',
-'sdppokdpotksdfo1','Law','Osama.Hany@guc.edu.eg'
+insert into PostGradUser values('Ahmed.Ali@gmail.com','nmnmss555') 
+set @ID = IDENT_CURRENT('PostGradUser') --10
+insert into NonGUCianStudent values (@ID,'Ahmed','Ali','Business','MSC',3.3,'Egypt,Giza,Haram')
+-----------------------------------------------------
+insert into Course values(8, 'CSEN1002',10000)
+insert into Course values(6, 'PHARM1201',12000)
+insert into Course values(4, 'ENG502',5000)
+insert into Course values(3, 'BUSS604',9000)
+insert into Course values(2, 'CSEN903',4000)
+-----------------------------------------------------
+insert into NonGucianStudentTakeCourse values(8,1,80.5)
+insert into NonGucianStudentTakeCourse values(8,5,92.3)
+insert into NonGucianStudentTakeCourse values(10,4,55)
+insert into NonGucianStudentTakeCourse values(10,1,68)
+-----------------------------------------------------
+insert into PostGradUser values('Mona.Farouk@guc.edu.eg','kzjfokjsovm54694') 
+set @ID = IDENT_CURRENT('PostGradUser') --11
+insert into admin values(@ID)
+-----------------------------------------------------
+insert into PostGradUser values('Mervat.Abuelkheir@guc.edu.eg','sdpsdosd') 
+set @ID = IDENT_CURRENT('PostGradUser') --12
+insert into supervisor values(@ID, 'Engineering', 'Mervat Abuelkheir')
 
-insert into thesis (field, type, title, start_date, end_date, num_extensions) 
-values 
-('Computer Science', 'MSC', 'User interface modernization', '3/20/2015', '11/20/2015', 0),
-('Computer Science', 'MSC', 'Development of an automated workplace', '5/30/2019', '1/2/2020', 1),
-('Computer Science', 'MSC', 'Online store development and creation', '7/25/2021', '4/25/2023', 1),
-('Medicine', 'PHD', 'The influence of IT in the field of biomedicine', '8/20/2021', '4/25/2024', 0),
-('Art', 'MSC', 'Gustav Klimt’s Painting Techniques', '10/20/2021', '6/25/2022', 0),
-('Art', 'MSC', 'Jazz Music of the 21st century', '10/20/2017', '10/25/2018', 0),
-('Art', 'PHD', 'Censorship of Art in Nazi Germany', '10/20/2020', '6/25/2024', 0),
-('Business', 'PHD', 'How can creative marketing increase your sales?', '10/10/2019', '6/10/2023', 1),
-('Law', 'PHD', 'Analysis of Welfare Politics in Japan', '9/9/2020', '6/10/2025', 2),
-('Business', 'MSC', 'Important aspects of workforce regulations', '1/24/2019', '4/25/2020', 1),
-('Engineering', 'PHD', 'Self-driving automobiles', '5/20/2019', '9/9/2024', 3),
-('Computer Science', 'MSC', 'What is the future of the Internet?', '8/20/2019', '9/9/2020', 0),
-('Medicine', 'MSC', 'Health problems caused by service time', '8/8/2017', '10/10/2018', 1),
-('Art', 'PHD', 'Ancient Greek Sculpture and Its Peculiarities', '11/11/2020', '11/11/2024', 1),
-('Business', 'MSC', 'How to motivate employees?', '6/6/2019', '5/5/2020', 0)
+insert into PostGradUser values('Haytham.Ismail@guc.edu.eg','sdppokdpotksdfo1') 
+set @ID = IDENT_CURRENT('PostGradUser') --13
+insert into supervisor values(@ID, 'Engineering', 'Haytham Ismail')
 
-exec AdminIssueThesisPayment 1, 20000, 2, 51.5, '0'
-exec AdminIssueThesisPayment 2, 8000, 1, 70, '0'
-exec AdminIssueThesisPayment 3, 40000, 3, 10, '0'
-exec AdminIssueThesisPayment 4, 80000, 5, 10, '0'
-exec AdminIssueThesisPayment 5, 30000, 2, 20, '0'
-exec AdminIssueInstallPayment 1, '4/20/2015'
-exec AdminIssueInstallPayment 2, '7/30/2019'
-exec AdminIssueInstallPayment 3, '8/25/2021'
-exec AdminIssueInstallPayment 4, '9/20/2021'
-exec AdminIssueInstallPayment 5, '11/25/2021'
+insert into PostGradUser values('Amr.El-Mougy@guc.edu.eg','pdofpsdkfvl') 
+set @ID = IDENT_CURRENT('PostGradUser') --14
+insert into supervisor values(@ID, 'Engineering', 'Amr EL-mougy')
+
+insert into PostGradUser values('Yasmin.Mohammed@guc.edu.eg','loskdfpo15065') 
+set @ID = IDENT_CURRENT('PostGradUser') --15
+insert into supervisor values(@ID, 'Pharmacy', 'Yasmin Mohammed')
+
+insert into PostGradUser values('Osama.Hany@guc.edu.eg','222jjjjjjjsss') 
+set @ID = IDENT_CURRENT('PostGradUser') --16
+insert into supervisor values(@ID, 'Law', 'Osama Hany')
+
+insert into PostGradUser values('Mohamed.Ismail@guc.edu.eg','mxmmxmmmxAA22') 
+set @ID = IDENT_CURRENT('PostGradUser') --17
+insert into supervisor values(@ID, 'Applied Arts', 'Mohamed Ismail')
+-----------------------------------------------------
+insert into PostGradUser values('Mark.Zuckerberg@gmail.com','MMMMM11111') 
+set @ID = IDENT_CURRENT('PostGradUser') --18
+insert into examiner values(@ID, 'Mark Zuckerberg', 'Engineering', '0')
+
+insert into PostGradUser values('Ahmed.Taher@gmail.com','asdqwerty55') 
+set @ID = IDENT_CURRENT('PostGradUser') --19
+insert into examiner values(@ID, 'Ahmed Taher', 'Engineering', '1')
+
+insert into PostGradUser values('Rola.Amer@gmail.com','cutecats88') 
+set @ID = IDENT_CURRENT('PostGradUser') --20
+insert into examiner values(@ID, 'Rola Amer', 'Medicine', '1')
+
+insert into PostGradUser values('Mina.Michael@gmail.com','55asasa55') 
+set @ID = IDENT_CURRENT('PostGradUser') --21
+insert into examiner values(@ID, 'Mina Michael', 'Bussiness', '1')
+-----------------------------------------------------
+insert into payment values(2, 20000, 51.5)
+insert into payment values(1, 8000, 70)
+insert into payment values(3, 40000, 12.5)
+insert into payment values(4, 80000, 10)
+insert into payment values(2, 30000, 20)
+-----------------------------------------------------
+insert into payment values(2, 10000, 20)
+insert into payment values(2, 9000, 20)
+insert into payment values(1, 4000, 20)
+-----------------------------------------------------
+insert into NonGucianStudentPayForCourse values(6,8,1)
+insert into NonGucianStudentPayForCourse values(8,8,4)
+insert into NonGucianStudentPayForCourse values(7,10,3)
+-----------------------------------------------------
+insert into thesis (field, type, title, start_date, end_date, num_extensions, payment_ID, grade, defenseDate) values 
+('Computer Science', 'MSC', 'User interface modernization', '3/20/2015', '11/20/2015', 0, 1, 90, '11/10/2015 13:00:00'),
+('Computer Science', 'MSC', 'Development of an automated workplace', '5/30/2019', '1/2/2020', 1, 2, 84, '1/1/2020 14:30:00'),
+('Computer Science', 'MSC', 'Online store development and creation', '7/25/2021', '4/25/2023', 1, 3, null, '3/25/2023 15:00:00'),
+('Medicine', 'PHD', 'The influence of IT in the field of biomedicine', '8/20/2021', '4/25/2024', 0, 4, null, '4/25/2024 14:00:00'),
+('Art', 'MSC', 'Gustav Klimt’s Painting Techniques', '10/20/2021', '6/25/2022', 0, 5, null, '6/25/2022 11:00:00'),
+('Art', 'MSC', 'Jazz Music of the 21st century', '10/20/2017', '10/25/2018', 0, null, null, null),
+('Art', 'PHD', 'Censorship of Art in Nazi Germany', '10/20/2020', '6/25/2024', 0, null, null, null),
+('Business', 'PHD', 'How can creative marketing increase your sales?', '10/10/2019', '6/10/2023', 1, null, null, null),
+('Law', 'PHD', 'Analysis of Welfare Politics in Japan', '9/9/2020', '6/10/2025', 2, null, null, null),
+('Business', 'MSC', 'Important aspects of workforce regulations', '1/24/2019', '4/25/2020', 1, null, null, null),
+('Engineering', 'PHD', 'Self-driving automobiles', '5/20/2019', '9/9/2024', 3, null, null, null),
+('Computer Science', 'MSC', 'What is the future of the Internet?', '8/20/2019', '9/9/2020', 0, null, null, null),
+('Medicine', 'MSC', 'Health problems caused by service time', '8/8/2017', '10/10/2018', 1, null, 66, null),
+('Art', 'PHD', 'Ancient Greek Sculpture and Its Peculiarities', '11/11/2020', '11/11/2024', 1, null, null, null),
+('Business', 'MSC', 'How to motivate employees?', '6/6/2019', '5/5/2020', 0, null, 60, '3/5/2020 11:00:00')
+-----------------------------------------------------
+insert into installment values(1,'4/20/2015','1',10000)
+insert into installment values(1,'10/20/2015','1',10000)
+insert into installment values(2,'7/30/2019','1',8000)
+insert into installment values(3,'7/25/2021','1',10000)
+insert into installment values(3,'2/25/2022','0',15000)
+insert into installment values(3,'10/25/2022','0',15000)
+insert into installment values(4,'8/20/2021','1',20000)
+insert into installment values(4,'4/20/2022','1',20000)
+insert into installment values(4,'11/20/2022','0',20000)
+insert into installment values(4,'8/20/2023','0',20000)
+-----------------------------------------------------
+insert into defense values('11/10/2015 13:00:00',1,90.5,'H15')
+insert into defense values('1/1/2020 14:30:00',2,70,'C2.201')
+insert into defense values('3/25/2023 15:00:00',3,null,'H5')
+insert into defense values('4/25/2024 14:00:00',4,null,'H17')
+insert into defense values('6/25/2022 11:00:00',5,null,'H15')
+insert into defense values('3/5/2020 11:00:00',15,80,'H12')
+-----------------------------------------------------
+insert into ExaminerEvaluateDefense values(18,'11/10/2015 13:00:00',1,'The contents were definitely sufficiently substantial and broad-ranging to allow coverage of the field. The only difficulty was that the field was so large that the candidates achievements tended to be isolated.')
+insert into ExaminerEvaluateDefense values(19,'1/1/2020 14:30:00',2,'this is a well-written thesis which presents interesting ideas across a quite broad range. I believe that there are several areas in which the discussion should be tightened and strengthened to make a convincing PhD thesis.')
+insert into ExaminerEvaluateDefense values(18,'3/25/2023 15:00:00',3,null)
+insert into ExaminerEvaluateDefense values(19,'3/25/2023 15:00:00',3,null)
+insert into ExaminerEvaluateDefense values(18,'4/25/2024 14:00:00',4,null)
+insert into ExaminerEvaluateDefense values(20,'4/25/2024 14:00:00',4,null)
+insert into ExaminerEvaluateDefense values(21,'3/5/2020 11:00:00',15,'The main weakness lies in the lack of resolution both to each chapter and to the thesis as a whole. Chapters end somewhat abruptly with no attempt to summarize and reflect upon what has been covered or point forward to subsequent chapters. Concluding summary discussions would be beneficial.')
+-----------------------------------------------------
+insert into GUCianStudentRegisterThesis values(1,13,1)
+insert into GUCianStudentRegisterThesis values(2,14,2)
+insert into GUCianStudentRegisterThesis values(4,15,4)
+insert into GUCianStudentRegisterThesis values(3,12,11)
+insert into NonGUCianStudentRegisterThesis values(10,12,15)
+insert into NonGUCianStudentRegisterThesis values(8,13,3)
+-----------------------------------------------------
+insert into GucianProgressReport(sid,date,evaluation,progress_state,vid,serial_num,description)
+VALUES
+(1,'5/10/2015',2,100,13,1,'this report concludes all the work done in the thesis'),
+(2,'10/24/2019',3,100,14,1,'this report includes the experiments, methods, and analysis of results for this thesis'),
+(4,'12/15/2021',1,30,15,4,'first report: getting started'),
+(4,'10/15/2022',1,null,15,4,'second report: materials and methods'),
+(4,'6/10/2023',2,null,15,4,'third report: further analysis'),
+(4,'1/7/2024',3,null,15,4,'final report: results and conclusion')
+-----------------------------------------------------
+insert into NonGucianProgressReport(sid,date,evaluation,progress_state,vid,serial_num,description)
+VALUES
+(10,'11/20/2019',1,60,12,15,'discussing mid life crisis'),
+(10,'4/25/2020',2,100,12,15,''),
+(8,'4/20/2022',0,null,13,3,'report 1: what the customers need'),
+(8,'1/8/2023',0,null,13,3,'')
+-----------------------------------------------------
+insert into publication(title,host,place,pub_date,is_accepted)
+values('motivating employees','Journal of Business Research','Egypt','6/1/2020',0)
+insert into ThesisHasPublication(serial_num,pubid)
+values(15,ident_current('publication'))
+
+insert into publication(title,host,place,pub_date,is_accepted)
+values('the future of the internet','Frontiers of computer science','Egypt','10/1/2020',1)
+insert into ThesisHasPublication(serial_num,pubid)
+values(15,ident_current('publication'))
+-----------------------------------------------------
