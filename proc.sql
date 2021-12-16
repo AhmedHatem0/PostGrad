@@ -1,4 +1,5 @@
-
+use postgrad_office
+go
 -- 1 a) Register to the website by using my name (First and last name), password, faculty, email, and address.
 create Proc StudentRegister 
 @first_name varchar(20),
@@ -79,13 +80,16 @@ Select * from thesis
 
 -- 3 d) List the number of on going theses.
 go
-create proc AdminViewOnGoingTheses
-@thesesCount int output
+create function AdminViewOnGoingTheses()
+returns int
 as
+begin
+declare @thesesCount int
 select @thesesCount = count(*) from thesis
 where current_timestamp >= start_date and 
 (end_date is null or current_timestamp <= end_date)
-
+return @thesesCount
+end
 -- 3 e) List all supervisors’ names currently supervising students, theses title, student name
 go
 create proc AdminViewStudentThesisBySupervisor
@@ -137,14 +141,16 @@ if (exists(select * from thesis t where t.serial_num = @ThesisSerialNo))
 	end
 else 
 	set @success = '0';
-print(@success)
 
 -- 3 i) view the profile of any student that contains all his/her information.
 go
 create proc AdminViewStudentProfile
 @sid Int 
 As
-select * from student where student.ID = @sid
+if(exists(select * from GUCianStudent where GUCianStudent.ID = @sid))
+select * from GUCianStudent where GUCianStudent.ID = @sid
+else
+select * from NonGUCianStudent where NonGUCianStudent.ID = @sid
 
 -- 3 j) Issue installments as per the number of installments for a certain payment every six months starting from the entered date.
 go
@@ -190,7 +196,7 @@ create proc linkCourseStudent
 @courseID int,
 @studentID int
 as
-insert into nonNonGucianStudentTakeCourse(sid, cid) 
+insert into NonGucianStudentTakeCourse(sid, cid) 
 values (@studentID, @courseID)
 
 go
@@ -254,7 +260,7 @@ where r.vid = @supervisorID
 
 -- 4 c) View my profile and update my personal information.
 go
-create proc SubViewProfile
+create proc SupViewProfile
 @supervisorID int
 as
 select * 
@@ -273,7 +279,7 @@ where ID = @supervisorID
 
 -- 4 d) View all publications of a student.
 go
-create proc ViewAllStudentPublications
+create proc ViewAStudentPublications
 @StudentID int
 as
 select *
@@ -295,6 +301,7 @@ create proc AddDefenseGucian
 as 
 insert into defense(date, serial_num, location) 
 values(@DefenseDate, @ThesisSerialNo, @DefenseLocation)
+update thesis set defenseDate = @DefenseDate where serial_num = @ThesisSerialNo
 
 go
 create proc AddDefenseNonGucian
@@ -307,7 +314,10 @@ select @min = min(t.grade)
 from NonGucianStudentTakeCourse t inner join NonGUCianStudentRegisterThesis m on m.sid = t.sid
 where m.serial_num = @ThesisSerialNo
 if(@min > 50)
+begin
 insert into defense(date,serial_num,location) values(@DefenseDate,@ThesisSerialNo,@DefenseLocation)
+update thesis set defenseDate = @DefenseDate where serial_num = @ThesisSerialNo
+end
 
 go
 -- 4 f) inserting an examiner in the examiner table and to his assigned thesis evaluation
@@ -342,14 +352,11 @@ go
 --4 h) adding a grade to a thesis
 create proc AddGrade
 @ThesisSerialNo int,
-@grade decimal(5,2) --improvised
+@grade decimal(5,2) 
 As
 update thesis 
 set thesis.grade = @grade
 where thesis.serial_num = @ThesisSerialNo;
-
--- The grade to be inserted is needed???
-
 
 --5 examiner
 --a
@@ -372,8 +379,6 @@ as
 update ExaminerEvaluateDefense
 set Comment = @comments
 where serial_num = @ThesisSerialNo and date = @DefenseDate and eid = @examinerID
-
-go
 
 --6
 --a 
@@ -491,13 +496,13 @@ declare @supID int
 if(exists(select sid from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo))
 begin
 select @studentID = sid, @supID = vid from GUCianStudentRegisterThesis where serial_num = @thesisSerialNo
-update GuianProgressReport 
+update GucianProgressReport 
 set progress_state = @state, vid = @supID,description = @description where report_num = @progressReportNo and SID = @studentID
 end
 else
 begin
 select  @studentID = sid, @supID = vid from NonGUCianStudentRegisterThesis where serial_num = @thesisSerialNo
-update NonGuianProgressReport 
+update NonGucianProgressReport 
 set progress_state = @state, vid = @supID,description = @description where report_num = @progressReportNo and SID = @studentID
 end
 
