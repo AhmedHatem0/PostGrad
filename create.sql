@@ -1,4 +1,4 @@
---drop database postgrad_office
+drop database postgrad_office
 create Database postgrad_office
 go
 use postgrad_office
