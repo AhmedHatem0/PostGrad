@@ -154,3 +154,8 @@ insert into ExaminerEvaluateDefense values(18,'4/25/2024 14:00:00',4,null)
 insert into ExaminerEvaluateDefense values(20,'4/25/2024 14:00:00',4,null)
 insert into ExaminerEvaluateDefense values(21,'3/5/2020 11:00:00',15,'The main weakness lies in the lack of resolution both to each chapter and to the thesis as a whole. Chapters end somewhat abruptly with no attempt to summarize and reflect upon what has been covered or point forward to subsequent chapters. Concluding summary discussions would be beneficial.')
 -----------------------------------------------------
+insert into GUCianStudentRegisterThesis values(1,13,1)
+insert into GUCianStudentRegisterThesis values(2,14,2)
+insert into GUCianStudentRegisterThesis values(4,20,4)
+insert into NonGUCianStudentRegisterThesis values(10,21,15)
+insert into NonGUCianStudentRegisterThesis values(8,13,3)
