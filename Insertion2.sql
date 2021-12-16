@@ -160,5 +160,4 @@ insert into GUCianStudentRegisterThesis values(4,20,4)
 insert into NonGUCianStudentRegisterThesis values(10,21,15)
 insert into NonGUCianStudentRegisterThesis values(8,13,3)
 
------------------------------------------------------
 
