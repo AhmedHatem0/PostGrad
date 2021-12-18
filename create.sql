@@ -1,4 +1,3 @@
-drop database postgrad_office
 create Database postgrad_office
 go
 use postgrad_office
@@ -20,6 +19,7 @@ type Varchar(10),
 GPA decimal(5,2),
 address varchar(50),
 UndergradID varchar(10),
+unique(UndergradID),
 foreign key(ID) references PostGradUser on delete cascade on update cascade)
 
 create table NonGUCianStudent(
@@ -74,7 +74,7 @@ payment_ID int,
 grade decimal(5,2),
 defenseDate datetime,
 years_spent as year(end_date) - year(start_date),
-foreign key(payment_ID) references payment on delete cascade on update cascade)
+foreign key(payment_ID) references payment on delete set null on update cascade)
 
 create table publication (
 pubid int primary key identity,
@@ -109,9 +109,10 @@ serial_num int,
 vid int,
 description varchar(200),
 primary key(report_num,sid),
-foreign key(serial_num) references thesis,
+check(evaluation >= 0 and evaluation <= 3),
+foreign key(serial_num) references thesis on delete cascade on update cascade,
 foreign key(sid) references GUCianStudent,
-foreign key(vid) references supervisor)
+foreign key(vid) references supervisor on delete set null on update cascade)
 
 create table NonGucianProgressReport(
 report_num int identity,
@@ -123,9 +124,10 @@ serial_num int,
 vid int,
 description varchar(200),
 primary key(report_num,sid),
-foreign key(serial_num) references thesis,
+check(evaluation >= 0 and evaluation <= 3),
+foreign key(serial_num) references thesis on delete cascade on update cascade,
 foreign key(sid) references NonGUCianStudent,
-foreign key(vid) references supervisor)
+foreign key(vid) references supervisor on delete set null on update cascade)
 
 create table installment(
 pid int,
@@ -158,8 +160,8 @@ vid int,
 serial_num int,
 primary key(sid, vid, serial_num),
 foreign key(sid) references GUCianStudent,
-foreign key(vid) references supervisor,
-foreign key(serial_num) references thesis)
+foreign key(vid) references supervisor on delete cascade on update cascade,
+foreign key(serial_num) references thesis on delete cascade on update cascade)
 
 create table NonGUCianStudentRegisterThesis(
 sid int,
@@ -167,8 +169,8 @@ vid int,
 serial_num int,
 primary key(sid, vid, serial_num),
 foreign key(sid) references NonGUCianStudent,
-foreign key(vid) references supervisor,
-foreign key(serial_num) references thesis)
+foreign key(vid) references supervisor on delete cascade on update cascade,
+foreign key(serial_num) references thesis on delete cascade on update cascade)
 
 create table ExaminerEvaluateDefense (
 eid int,
