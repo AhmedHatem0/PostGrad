@@ -52,7 +52,7 @@ insert into Course values(2, 'CSEN903',4000)
 -----------------------------------------------------
 insert into NonGucianStudentTakeCourse values(8,1,80.5)
 insert into NonGucianStudentTakeCourse values(8,5,92.3)
-insert into NonGucianStudentTakeCourse values(10,4,55)
+insert into NonGucianStudentTakeCourse values(10,4,null)
 insert into NonGucianStudentTakeCourse values(10,1,68)
 -----------------------------------------------------
 insert into PostGradUser values('Mona.Farouk@guc.edu.eg','kzjfokjsovm54694') 
@@ -131,7 +131,7 @@ insert into thesis (field, type, title, start_date, end_date, num_extensions, pa
 ('Business', 'MSC', 'How to motivate employees?', '6/6/2019', '5/5/2020', 0, null, 60, '3/5/2020 11:00:00')
 -----------------------------------------------------
 insert into installment values(1,'4/20/2015','1',10000)
-insert into installment values(1,'10/20/2015','1',10000)
+insert into installment values(1,'10/20/2015','0',10000)
 insert into installment values(2,'7/30/2019','1',8000)
 insert into installment values(3,'7/25/2021','1',10000)
 insert into installment values(3,'2/25/2022','0',15000)
@@ -140,6 +140,7 @@ insert into installment values(4,'8/20/2021','1',20000)
 insert into installment values(4,'4/20/2022','1',20000)
 insert into installment values(4,'11/20/2022','0',20000)
 insert into installment values(4,'8/20/2023','0',20000)
+insert into installment values(8,'8/20/2023','0',20000)
 -----------------------------------------------------
 insert into defense values('11/10/2015 13:00:00',1,90.5,'H15')
 insert into defense values('1/1/2020 14:30:00',2,70,'C2.201')
@@ -175,7 +176,7 @@ VALUES
 insert into NonGucianProgressReport(sid,date,evaluation,progress_state,vid,serial_num,description)
 VALUES
 (10,'11/20/2019',1,60,12,15,'discussing mid life crisis'),
-(10,'4/25/2020',2,100,12,15,''),
+(10,'4/25/2020',0,100,12,15,''),
 (8,'4/20/2022',0,null,13,3,'report 1: what the customers need'),
 (8,'1/8/2023',0,null,13,3,'')
 -----------------------------------------------------
