@@ -1,4 +1,4 @@
-﻿use postgrad_office
+use postgrad_office
 
 exec StudentRegister 
 'Adhm','Mohamed','3.14adhm','Engineering','1',
@@ -59,11 +59,11 @@ exec AddCourse 'ARTS505',6,10000
 
 exec linkCourseStudent 6, 9
 
-exec addStudentCourseGrade 8, 3, 99.5
+exec addStudentCourseGrade 10, 4, 99.5
 
 exec ViewExamSupDefense '3/25/2023 15:00:00'
 
-exec EvaluateProgressReport 13, 3, 9, 2
+exec EvaluateProgressReport 13, 3, 3, 2
 
 exec ViewSupStudentsYears 13
 
@@ -71,7 +71,7 @@ exec SupViewProfile 12
 
 exec UpdateSupProfile 13, 'Haythm Othman', 'Engineering'
 
-exec ViewAStudentPublications 2
+exec ViewAStudentPublications 10
 
 exec AddDefenseGucian  11,'8/9/2024 14:00:00','H17'
 
@@ -79,9 +79,9 @@ exec AddDefenseNonGucian 15,'3/25/2020 11:00:00','H2'
 
 exec AddExaminer 11, '8/9/2024 14:00:00', 'Mark Zuckerberg', '0', 'Engineering'
 
-exec CancelThesis 13
+exec CancelThesis 15
 
-exec AddGrade 2, 80
+exec AddGrade 5, 80
 
 exec AddDefenseGrade 3,'3/25/2023 15:00:00',77
 
@@ -91,21 +91,21 @@ exec viewMyProfile 1
 
 exec editMyProfile 1,'Methat','Mohamed','3.14159265358979','Methat@gmail.com','Egypt,Suez,Fasil,Al-Amal','MSC'
 
-exec addUndergradID 1,'49-12345'
+exec addUndergradID 1,'49-17771'
 
-exec ViewCoursesGrades 1
+exec ViewCoursesGrades 8
 
-exec ViewCoursePaymentsInstall 1
+exec ViewCoursePaymentsInstall 8
 
 exec ViewThesisPaymentsInstall 1
 
-exec ViewUpcomingInstallments 1
+exec ViewUpcomingInstallments 4
 
 exec ViewMisedInstallments 1
 
 exec AddProgressReport 1,'5/10/2015'
 
-exec FillProgressReport 15,1 , 3,' results and conclusion' 
+exec FillProgressReport 15, 1, 30, 'results and conclusion' 
 
 exec ViewEvalProgressReport 1, 1
 
