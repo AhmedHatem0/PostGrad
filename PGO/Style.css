@@ -1,0 +1,47 @@
+﻿body {
+    font-family: sans-serif;
+    background-image: url('keyboard.jpg');
+    background-size: cover;
+    background-attachment: fixed;
+}
+form {
+    text-align: center;
+    background-color: rgba(255, 255, 255, 0.75);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    -webkit-transform: translate(-50%, -50%);
+    transform: translate(-50%, -50%);
+    padding: 40px;
+    border-radius: 5px;
+}
+.button {
+    cursor: pointer;
+    color: #000;
+    background: none;
+    border: 1.5px solid #000;
+    border-radius: 2px;
+    padding: 5px;
+    margin: 2px;
+    transition: all .5s ease-in-out;
+}
+.button:hover {
+   background:#000;
+   color:#fff;
+}
+.label {
+    width: 250px;
+    margin: 2px;
+}
+.textbox {
+    border: 1.5px solid #fff;
+    border-radius: 2px;
+    margin: 2px;
+    width: 250px;
+}
+.dropdown {
+    border: 1.5px solid #fff;
+    border-radius: 2px;
+    margin: 2px;
+    width: 260px;
+}
